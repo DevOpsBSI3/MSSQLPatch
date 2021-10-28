@@ -1,0 +1,25 @@
+---
+-
+  hosts: dbservers
+  serial: 1
+  become: yes
+  gather_facts: false
+  name: "Copy db files and install it then reboot"
+  tasks:
+    - name: Copying ...
+      copy:
+        dest: "{{dest}}"
+        src: "{{source}}"
+    - name: Installing ...
+      command: "sudo dpkg -i /home/azureuser/mssqldebdest/mssql-server_15.0.4153.1-6_amd64.deb"
+      register: command_output_lines
+    -
+      debug:
+        msg: "{{ command_output_lines.stdout_lines }}"
+    - name: Rebooting ...
+      reboot:
+        reboot_timeout: 60
+        test_command: uptime
+  vars:
+    dest: /home/azureuser/mssqldebdest
+    source: /var/lib/jenkins/workspace/DBPatchAutomate/DBPatchUpgrade/mssql-server_15.0.4153.1-6_amd64.deb
